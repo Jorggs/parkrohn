@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Funnel Splitter</title>
+  <style>
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      color: #4B0082;
+      text-align: center;
+      margin: 0 0 10px 0;
+      font-size: 2em;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .dropzone {
+      border: 3px dashed #4B0082;
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      background: #f8f9ff;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      margin-bottom: 20px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dropzone:hover {
+      background: #f0f2ff;
+      border-color: #6B46C1;
+      transform: translateY(-2px);
+    }
+
+    .dropzone-content {
+      pointer-events: none;
+    }
+
+    .dropzone-icon {
+      font-size: 3em;
+      margin-bottom: 10px;
+      opacity: 0.3;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 20px 0;
+      padding: 20px;
+      background: #f8f9ff;
+      border-radius: 8px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #4B0082;
+    }
+
+    .controls {
+      display: none;
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: #f8f9ff;
+      border-radius: 8px;
+    }
+
+    .control-group {
+      margin-bottom: 20px;
+    }
+
+    .control-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #4B0082;
+    }
+
+    .control-group input {
+      padding: 10px 15px;
+      font-size: 1em;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      width: 150px;
+    }
+
+    .funnel-inputs {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .funnel-input-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .funnel-input-row label {
+      font-weight: normal;
+      min-width: 100px;
+      text-align: right;
+    }
+
+    .funnel-input-row input {
+      width: 120px;
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+    }
+
+    button {
+      background: #4B0082;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+
+    button:hover:not(:disabled) {
+      background: #6B46C1;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(75, 0, 130, 0.3);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .result-section {
+      display: none;
+      margin-top: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 20px 0;
+    }
+
+    th {
+      background: #FF7F00;
+      color: white;
+      padding: 12px 8px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    tr:hover {
+      background: #f8f9ff;
+    }
+
+    .funnel-a { background: #ccffcc; }
+    .funnel-b { background: #cce5ff; }
+    .funnel-c { background: #ffccff; }
+    .funnel-d { background: #ffffcc; }
+    .funnel-e { background: #ffcccc; }
+    .funnel-f { background: #e6ccff; }
+    .funnel-g { background: #ffe6cc; }
+    .funnel-h { background: #ccffe6; }
+    .funnel-i { background: #ffcce6; }
+    .funnel-j { background: #e6ffcc; }
+
+    .download-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔀 Multi-Funnel Splitter</h1>
+    <p class="subtitle">Split single funnel data into multiple funnels (2-10) for testing</p>
+
+    <div class="dropzone" id="timerDrop">
+      <div class="dropzone-content">
+        <div class="dropzone-icon">⏱️</div>
+        <strong>Timer File</strong>
+        <p>Drop single timer file or click to select</p>
+      </div>
+      <input type="file" id="timerFile" style="display:none" accept=".csv,.txt">
+    </div>
+
+    <div class="dropzone" id="scanDrop">
+      <div class="dropzone-content">
+        <div class="dropzone-icon">📋</div>
+        <strong>Scan File(s)</strong>
+        <p>Drop scan files or click to select</p>
+      </div>
+      <input type="file" id="scanFile" style="display:none" accept=".txt,.csv" multiple>
+    </div>
+
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-label">Timer Records</div>
+        <div class="stat-value" id="timerCount">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Scan Records</div>
+        <div class="stat-value" id="scanCount">0</div>
+      </div>
+    </div>
+
+    <div class="controls" id="controls">
+      <div class="control-group">
+        <label for="numFunnels">Number of Funnels to Create:</label>
+        <input type="number" id="numFunnels" value="2" min="2" max="10">
+        <button id="setupFunnels">Setup Funnels</button>
+      </div>
+
+      <div class="funnel-inputs" id="funnelInputs"></div>
+
+      <button id="generateBtn" style="display:none">Generate Multi-Funnel Data</button>
+    </div>
+
+    <div id="alerts"></div>
+
+    <div class="result-section" id="resultSection">
+      <h2 style="text-align:center; color:#4B0082">Generated Funnel Data</h2>
+      <div id="resultTable"></div>
+      
+      <div class="download-section" id="downloadSection"></div>
+    </div>
+  </div>
+
+  <script>
+    const app = {
+      timerData: [],
+      timerHeader: [],
+      scanData: [],
+      mergedData: [],
+      funnelConfig: [],
+
+      init() {
+        this.setupDropZones();
+        this.setupEventListeners();
+      },
+
+      setupDropZones() {
+        ['timerDrop', 'scanDrop'].forEach(id => {
+          const drop = document.getElementById(id);
+          const fileId = id.replace('Drop', 'File');
+          const input = document.getElementById(fileId);
+
+          drop.onclick = () => input.click();
+          
+          drop.ondragover = (e) => {
+            e.preventDefault();
+            drop.style.borderColor = '#6B46C1';
+            drop.style.background = '#f0f2ff';
+          };
+          
+          drop.ondragleave = () => {
+            drop.style.borderColor = '#4B0082';
+            drop.style.background = '#f8f9ff';
+          };
+          
+          drop.ondrop = (e) => {
+            e.preventDefault();
+            drop.style.borderColor = '#4B0082';
+            drop.style.background = '#f8f9ff';
+            this.handleFiles(e.dataTransfer.files, id);
+          };
+
+          input.onchange = (e) => this.handleFiles(e.target.files, id);
+        });
+      },
+
+      setupEventListeners() {
+        document.getElementById('setupFunnels').onclick = () => this.setupFunnelInputs();
+        document.getElementById('generateBtn').onclick = () => this.generateFunnels();
+        document.getElementById('numFunnels').oninput = () => {
+          document.getElementById('funnelInputs').style.display = 'none';
+          document.getElementById('generateBtn').style.display = 'none';
+        };
+      },
+
+      async handleFiles(files, dropId) {
+        for (let file of files) {
+          const text = await file.text();
+          
+          if (dropId === 'timerDrop') {
+            this.parseTimer(text);
+            document.getElementById('timerDrop').innerHTML = 
+              `<div class="dropzone-content"><strong>✓ ${file.name}</strong><p>${this.timerData.length} records</p></div>`;
+          } else if (dropId === 'scanDrop') {
+            this.scanData = this.scanData.concat(this.parseScan(text));
+            document.getElementById('scanDrop').innerHTML = 
+              `<div class="dropzone-content"><strong>✓ ${files.length} file(s)</strong><p>${this.scanData.length} scans</p></div>`;
+          }
+        }
+        
+        this.updateStats();
+        this.checkReady();
+      },
+
+      parseTimer(text) {
+        let lines = text.trim().split('\n');
+        
+        // Check for STARTOFEVENT format
+        if (lines[0] && lines[0].trim().startsWith('STARTOFEVENT')) {
+          this.timerHeader = lines.slice(0, 2);
+          lines = lines.slice(2, -1);
+          this.timerData = [];
+          for (let i = 0; i < lines.length; i++) {
+            const parts = lines[i].split(',');
+            if (parts.length >= 3) {
+              let time = parts[2].trim();
+              if (time.startsWith('00:')) time = time.slice(3);
+              this.timerData.push({ position: parts[0].trim(), time: time });
+            }
+          }
+          return;
+        }
+        
+        // Standard format
+        this.timerHeader = lines.slice(0, 2);
+        this.timerData = [];
+        for (let i = 2; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+          
+          const parts = line.split(',');
+          if (parts[0] === 'T' && parts.length >= 4) {
+            this.timerData.push({
+              position: parts[1],
+              time: parts[3].replace('.000', '').trim()
+            });
+          }
+        }
+      },
+
+      parseScan(text) {
+        const lines = text.trim().split('\n');
+        const data = [];
+        
+        for (let line of lines) {
+          line = line.trim();
+          if (!line || line.startsWith('Start of File')) continue;
+          
+          const parts = line.split(',');
+          if (parts.length >= 2) {
+            let pnum = parts[1].trim();
+            // Only normalize if it actually has a P-number
+            if (pnum && pnum.startsWith('P')) {
+              pnum = 'P' + pnum.slice(1).replace(/^0+/, '');
+            } else {
+              pnum = ''; // No P-number
+            }
+            
+            // Capture the timestamp if present (third column)
+            let timestamp = '';
+            if (parts.length >= 3) {
+              timestamp = parts.slice(2).join(',').trim(); // Everything after second comma
+            }
+            
+            data.push({
+              athlete: parts[0].trim(),
+              pnumber: pnum,
+              timestamp: timestamp,
+              hasOriginalPnumber: pnum !== ''
+            });
+          }
+        }
+        
+        return data;
+      },
+
+      updateStats() {
+        document.getElementById('timerCount').textContent = this.timerData.length;
+        document.getElementById('scanCount').textContent = this.scanData.length;
+      },
+
+      checkReady() {
+        if (this.timerData.length && this.scanData.length) {
+          document.getElementById('controls').style.display = 'block';
+        }
+      },
+
+      setupFunnelInputs() {
+        const numFunnels = parseInt(document.getElementById('numFunnels').value);
+        if (numFunnels < 2 || numFunnels > 10) {
+          alert('Please enter a number between 2 and 10');
+          return;
+        }
+
+        const container = document.getElementById('funnelInputs');
+        const funnelLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+        
+        let html = '<div class="alert">Configure starting position for each funnel. Funnel A always starts at 1.</div>';
+        
+        for (let i = 0; i < numFunnels; i++) {
+          const label = funnelLabels[i];
+          const defaultValue = i === 0 ? 1 : (i * 800 + 1);
+          
+          html += `<div class="funnel-input-row">
+            <label>Funnel ${label} starts at:</label>
+            <input type="number" id="funnel${label}Start" value="${defaultValue}" ${i === 0 ? 'readonly' : ''} min="1">
+          </div>`;
+        }
+        
+        container.innerHTML = html;
+        container.style.display = 'block';
+        document.getElementById('generateBtn').style.display = 'inline-block';
+      },
+
+      generateFunnels() {
+        const numFunnels = parseInt(document.getElementById('numFunnels').value);
+        const funnelLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+        
+        // Get funnel configurations
+        this.funnelConfig = [];
+        for (let i = 0; i < numFunnels; i++) {
+          const label = funnelLabels[i];
+          const start = parseInt(document.getElementById(`funnel${label}Start`).value);
+          this.funnelConfig.push({ label, start });
+        }
+        
+        // Sort by start position
+        this.funnelConfig.sort((a, b) => a.start - b.start);
+        
+        // Merge timer and scan data
+        this.mergeData();
+        
+        // Assign to funnels randomly
+        this.assignToFunnels();
+        
+        // Display results
+        this.displayResults();
+        
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+      },
+
+      mergeData() {
+        // Create scan map (only for athletes with P-numbers)
+        const scanMap = {};
+        const athletesWithoutPnumber = [];
+        
+        this.scanData.forEach(scan => {
+          if (scan.hasOriginalPnumber) {
+            const key = this.normalizePnum(scan.pnumber);
+            if (!scanMap[key]) {
+              scanMap[key] = { athlete: scan.athlete, timestamp: scan.timestamp };
+            }
+          } else {
+            // Keep track of athletes without P-numbers
+            athletesWithoutPnumber.push({ athlete: scan.athlete, timestamp: scan.timestamp });
+          }
+        });
+        
+        // Merge with timer data
+        const merged = [];
+        const usedKeys = new Set();
+        
+        this.timerData.forEach(timer => {
+          const key = timer.position.replace(/^P/, '').replace(/^0+/, '');
+          let athlete = '';
+          let timestamp = '';
+          
+          if (scanMap[key]) {
+            athlete = scanMap[key].athlete;
+            timestamp = scanMap[key].timestamp;
+            usedKeys.add(key);
+          }
+          
+          merged.push({
+            originalPos: timer.position,
+            time: timer.time,
+            athlete: athlete,
+            timestamp: timestamp,
+            hasOriginalPnumber: true
+          });
+        });
+        
+        // Add unmatched scans that have P-numbers
+        this.scanData.forEach(scan => {
+          if (scan.hasOriginalPnumber) {
+            const key = this.normalizePnum(scan.pnumber);
+            if (!usedKeys.has(key)) {
+              merged.push({
+                originalPos: '',
+                time: '',
+                athlete: scan.athlete,
+                timestamp: scan.timestamp,
+                hasOriginalPnumber: true
+              });
+            }
+          }
+        });
+        
+        // Add athletes without P-numbers at the end
+        athletesWithoutPnumber.forEach(item => {
+          merged.push({
+            originalPos: '',
+            time: '',
+            athlete: item.athlete,
+            timestamp: item.timestamp,
+            hasOriginalPnumber: false
+          });
+        });
+        
+        // Sort by time
+        merged.sort((a, b) => {
+          if (a.time && b.time) return this.timeToSeconds(a.time) - this.timeToSeconds(b.time);
+          if (a.time) return -1;
+          if (b.time) return 1;
+          return 0;
+        });
+        
+        this.mergedData = merged;
+      },
+
+      assignToFunnels() {
+        const funnelCounters = this.funnelConfig.map(f => ({ label: f.label, start: f.start, counter: 0 }));
+        const numFunnels = this.funnelConfig.length;
+        const lastFunnelIdx = numFunnels - 1;
+        
+        // Separate records with time from those without, and those without original P-numbers
+        const timedRecords = this.mergedData.filter(r => r.time && r.hasOriginalPnumber);
+        const untimedRecords = this.mergedData.filter(r => !r.time && r.hasOriginalPnumber);
+        const noPnumberRecords = this.mergedData.filter(r => !r.hasOriginalPnumber);
+        
+        const totalTimed = timedRecords.length;
+        
+        // Assign first 10 timed records to Funnel A
+        const first10Count = Math.min(10, totalTimed);
+        for (let i = 0; i < first10Count; i++) {
+          const record = timedRecords[i];
+          const funnel = funnelCounters[0]; // Funnel A
+          
+          record.funnel = funnel.label;
+          record.newPosition = funnel.start + funnel.counter;
+          record.newPnumber = 'P' + record.newPosition;
+          funnel.counter++;
+        }
+        
+        // Set aside the last 10 timed records (we'll assign them later)
+        const last10Start = Math.max(first10Count, totalTimed - 10);
+        const last10Records = timedRecords.slice(last10Start);
+        
+        // Randomly distribute middle timed records, but ensure each funnel gets at least one
+        // if it doesn't already have one (to avoid empty first positions)
+        const middleRecords = timedRecords.slice(first10Count, last10Start);
+        
+        // Check which funnels still need their first record
+        const needsFirst = [];
+        for (let i = 0; i < numFunnels; i++) {
+          if (funnelCounters[i].counter === 0) {
+            needsFirst.push(i);
+          }
+        }
+        
+        // Assign first record to each funnel that needs one
+        let middleIdx = 0;
+        for (let funnelIdx of needsFirst) {
+          if (middleIdx < middleRecords.length) {
+            const record = middleRecords[middleIdx];
+            const funnel = funnelCounters[funnelIdx];
+            
+            record.funnel = funnel.label;
+            record.newPosition = funnel.start + funnel.counter;
+            record.newPnumber = 'P' + record.newPosition;
+            funnel.counter++;
+            middleIdx++;
+          }
+        }
+        
+        // Randomly distribute remaining middle records
+        for (let i = middleIdx; i < middleRecords.length; i++) {
+          const record = middleRecords[i];
+          const funnelIdx = Math.floor(Math.random() * numFunnels);
+          const funnel = funnelCounters[funnelIdx];
+          
+          record.funnel = funnel.label;
+          record.newPosition = funnel.start + funnel.counter;
+          record.newPnumber = 'P' + record.newPosition;
+          funnel.counter++;
+        }
+        
+        // NOW assign the last 10 timed records to the end of the last funnel
+        last10Records.forEach(record => {
+          const funnel = funnelCounters[lastFunnelIdx];
+          
+          record.funnel = funnel.label;
+          record.newPosition = funnel.start + funnel.counter;
+          record.newPnumber = 'P' + record.newPosition;
+          funnel.counter++;
+        });
+        
+        // Handle records without times - ALL go to the LAST funnel
+        untimedRecords.forEach(record => {
+          const funnel = funnelCounters[lastFunnelIdx];
+          
+          record.funnel = funnel.label;
+          record.newPosition = funnel.start + funnel.counter;
+          record.newPnumber = 'P' + record.newPosition;
+          funnel.counter++;
+        });
+        
+        // Handle records without original P-numbers - randomly distribute, don't assign them positions
+        noPnumberRecords.forEach(record => {
+          const funnelIdx = Math.floor(Math.random() * numFunnels);
+          record.funnel = funnelCounters[funnelIdx].label;
+          record.newPosition = '';
+          record.newPnumber = '';
+        });
+        
+        // Sort by funnel and position
+        this.mergedData.sort((a, b) => {
+          if (a.funnel !== b.funnel) {
+            return a.funnel.localeCompare(b.funnel);
+          }
+          // Records without positions go to the end of their funnel
+          if (!a.newPosition && b.newPosition) return 1;
+          if (a.newPosition && !b.newPosition) return -1;
+          if (!a.newPosition && !b.newPosition) return 0;
+          return a.newPosition - b.newPosition;
+        });
+      },
+
+      displayResults() {
+        let html = '<table><thead><tr>';
+        html += '<th>Orig Pos</th><th>Time</th><th>Athlete</th><th>Funnel</th><th>New Pos</th><th>New P#</th>';
+        html += '</tr></thead><tbody>';
+        
+        this.mergedData.forEach(record => {
+          const funnelClass = 'funnel-' + record.funnel.toLowerCase();
+          html += `<tr class="${funnelClass}">
+            <td>${record.originalPos}</td>
+            <td>${record.time}</td>
+            <td>${record.athlete}</td>
+            <td>${record.funnel}</td>
+            <td>${record.newPosition}</td>
+            <td>${record.newPnumber}</td>
+          </tr>`;
+        });
+        
+        html += '</tbody></table>';
+        document.getElementById('resultTable').innerHTML = html;
+        
+        // Create download buttons
+        this.createDownloadButtons();
+      },
+
+      createDownloadButtons() {
+        const container = document.getElementById('downloadSection');
+        let html = '';
+        
+        // Timer file buttons for each funnel
+        this.funnelConfig.forEach(funnel => {
+          html += `<button onclick="app.downloadTimer('${funnel.label}')">💾 Download Funnel ${funnel.label} Timer</button>`;
+        });
+        
+        // Scan file button
+        html += `<button onclick="app.downloadScan()">💾 Download Combined Scan File</button>`;
+        
+        container.innerHTML = html;
+      },
+
+      downloadTimer(funnelLabel) {
+        const funnelRecords = this.mergedData.filter(r => r.funnel === funnelLabel && r.time);
+        
+        let content = this.timerHeader.join('\n') + '\n';
+        funnelRecords.forEach((rec, idx) => {
+          content += `T,${idx + 1},1,${rec.time}\n`;
+        });
+        
+        this.download(`funnel${funnelLabel}_timer.csv`, content);
+      },
+
+      downloadScan() {
+        // Generate a fallback timestamp for records that don't have one
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        const fallbackTimestamp = `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
+        
+        let content = '';
+        this.mergedData.forEach(rec => {
+          if (rec.athlete) {
+            // Only include P-number if the athlete originally had one
+            const pnumber = rec.hasOriginalPnumber ? rec.newPnumber : '';
+            // Use original timestamp if available, otherwise use fallback
+            const timestamp = rec.timestamp || fallbackTimestamp;
+            content += `${rec.athlete},${pnumber},${timestamp}\n`;
+          }
+        });
+        
+        this.download('combined_scan.txt', content);
+      },
+
+      download(filename, content) {
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+
+      normalizePnum(pnum) {
+        return pnum.replace('P', '').replace(/^0+/, '');
+      },
+
+      timeToSeconds(time) {
+        const parts = time.split(':').map(Number);
+        if (parts.length === 2) return parts[0] * 60 + parts[1];
+        if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+        return 0;
+      }
+    };
+
+    app.init();
+  </script>
+</body>
+</html>

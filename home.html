@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Double Funnel</title>
+    <style>
+        :root {
+            --brand: #4B0082;
+            --bg1: #f6f7ff;
+            --bg2: #f2f0fb;
+            --card: rgba(255, 255, 255, 0.94);
+            --border: rgba(75, 0, 130, 0.14);
+            --shadow: 0 14px 40px rgba(0, 0, 0, 0.10);
+            --text: #1b1b1f;
+            --muted: #545463;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            margin: 0;
+            padding: 32px 16px 48px;
+            line-height: 1.65;
+            color: var(--text);
+            background:
+                radial-gradient(1100px 700px at 15% 10%, rgba(108, 123, 215, 0.30), transparent 60%),
+                radial-gradient(900px 600px at 90% 20%, rgba(75, 0, 130, 0.16), transparent 55%),
+                linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: var(--card);
+            border-radius: 18px;
+            padding: 22px 22px 10px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        /* ── Header layout ── */
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            padding: 8px 0 18px;
+            flex-wrap: wrap;
+        }
+
+        .logo-container {
+            flex-shrink: 0;
+        }
+
+        .logo-container img {
+            width: 160px;
+            height: auto;
+            border-radius: 14px;
+            display: block;
+        }
+
+        /* ── Showcase panel ── */
+        .showcase {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .showcase-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .showcase-label span {
+            color: var(--brand);
+        }
+
+        .ticker-wrap {
+            position: relative;
+            overflow: hidden;
+            height: 52px;
+        }
+
+        /* each slide */
+        .ticker-slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.55s cubic-bezier(.4, 0, .2, 1),
+                transform 0.55s cubic-bezier(.4, 0, .2, 1);
+            pointer-events: none;
+        }
+
+        .ticker-slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ticker-slide.leaving {
+            opacity: 0;
+            transform: translateY(-22px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        .parkrun-name {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--brand);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        /* dot progress strip */
+        .dot-strip {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(75, 0, 130, 0.18);
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .dot.active {
+            background: var(--brand);
+            transform: scale(1.35);
+        }
+
+        /* Brand (legacy) */
+        .brand {
+            display: none;
+            /* replaced by header-row */
+        }
+
+        h1,
+        h2 {
+            color: var(--brand);
+            margin-top: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 6px 0 18px;
+            padding: 10px 0 6px;
+            border-top: 1px solid rgba(75, 0, 130, 0.10);
+            border-bottom: 1px solid rgba(75, 0, 130, 0.10);
+        }
+
+        .nav-buttons a {
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background-color: rgba(75, 0, 130, 0.06);
+            color: var(--brand);
+            border: 1px solid rgba(75, 0, 130, 0.18);
+            font-weight: 600;
+            transition: transform 0.12s ease, background-color 0.18s ease, border-color 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .nav-buttons a:hover {
+            background-color: rgba(75, 0, 130, 0.12);
+            border-color: rgba(75, 0, 130, 0.28);
+            transform: translateY(-1px);
+        }
+
+        .section {
+            margin-bottom: 14px;
+            padding: 16px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(75, 0, 130, 0.10);
+            background: rgba(255, 255, 255, 0.78);
+        }
+
+        .section h2 {
+            margin: 0 0 10px;
+            font-size: 1.25rem;
+        }
+
+        p {
+            margin: 10px 0;
+            color: #2a2a33;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 10px 0 0;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .section img {
+            max-width: 100%;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.10);
+            margin-top: 10px;
+        }
+
+        a {
+            color: var(--brand);
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding-top: 18px;
+            }
+
+            .container {
+                padding: 18px 16px 8px;
+            }
+
+            .section {
+                padding: 14px 14px;
+            }
+
+            .nav-buttons {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-row">
+            <div class="logo-container">
+                <img src="parkrohn-logo.png" alt="parkrohn logo">
+            </div>
+            <div class="showcase">
+                <div class="showcase-label">
+                    Parkruns that have used parkrohn &mdash; <span id="count-label"></span> and counting!
+                </div>
+                <div class="ticker-wrap" id="ticker"></div>
+                <div class="dot-strip" id="dots"></div>
+            </div>
+        </div>
+
+        <script>
+            // ── ADD NEW PARKRUNS HERE ──────────────────────────────────────────
+        const PARKRUNS = [
+            "Preston Park",
+            "Hove Promenade",
+            "Norwich",
+            "Milton Keynes",
+            "Worcester",
+            "University Parks",
+            "Coventry",
+            "Green Park",
+			"Victoria Embankment",
+			"Cassiobury",
+        ];
+        // ──────────────────────────────────────────────────────────────────
+
+        (function () {
+            const ticker = document.getElementById('ticker');
+            const dotStrip = document.getElementById('dots');
+            const countLabel = document.getElementById('count-label');
+
+            countLabel.textContent = PARKRUNS.length;
+
+
+            // Build slides
+            const slides = PARKRUNS.map((name, i) => {
+                const el = document.createElement('div');
+                el.className = 'ticker-slide' + (i === 0 ? ' active' : '');
+                el.innerHTML = `<span class="parkrun-name">${name} parkrun</span>`;
+                ticker.appendChild(el);
+                return el;
+            });
+
+            // Build dots
+            const dots = PARKRUNS.map((_, i) => {
+                const d = document.createElement('div');
+                d.className = 'dot' + (i === 0 ? ' active' : '');
+                dotStrip.appendChild(d);
+                return d;
+            });
+
+            let current = 0;
+
+            function advance() {
+                const prev = current;
+                current = (current + 1) % PARKRUNS.length;
+
+                slides[prev].classList.remove('active');
+                slides[prev].classList.add('leaving');
+                dots[prev].classList.remove('active');
+
+                setTimeout(() => slides[prev].classList.remove('leaving'), 500);
+
+                slides[current].classList.add('active');
+                dots[current].classList.add('active');
+            }
+
+            setInterval(advance, 2800);
+        })();
+        </script>
+        <div class="container">
+            <div class="nav-buttons">
+                <a href="user_guide.html">User Guide</a>
+                <a href="news.html">News</a>
+                <a href="parkrohn.html" target="_blank" title="Opens in a new tab">Process Funnels</a>
+                <a href="Multi_Funnel_Splitter.html" target="_blank" title="Opens in a new tab">Create Sample Data</a>
+                <a href="funnel-simulator.html" target="_blank" title="Opens in a new tab">Funnel Simulator</a>
+            </div>
+
+
+        
+            <h1>Why a Real Double Funnel?</h1>
+
+            <div class="section">
+                <h2>Limit of Single Funnel</h2>
+                <p>A single funnel has capacity problems when the number of finishers per minute exceeds the maximum
+                    number
+                    of tokens the token distributors can hand out. This starts to become a problem when there are over
+                    750
+                    finishers, becoming more serious when over 1000.</p>
+            </div>
+
+            <div class="section">
+                <h2>Limitation of Conventional Double Funnel</h2>
+                <p>The only advantage of a traditional double funnel is that it brings the finish line closer to tokens.
+                    But
+                    a 100 metre funnel is the same length as two 50 metre ones, and the number of people per minute who
+                    can
+                    leave the funnel is the same as for a single.</p>
+                <p>There's also a significant volunteer overhead managing the left/right swap and stopping and starting
+                    the
+                    queues.</p>
+            </div>
+
+            <div class="section">
+                <h2>Purpose of the Real Double Funnel</h2>
+                <p>The Real Double Funnel doubles the number of tokens per minute that can be given out and therefore
+                    reduces queueing. We have written the software to handle two funnels but the principle will work
+                    with any number of funnels.</p>
+            </div>
+            <div class="section">
+                <h2>History of the Real Double Funnel</h2>
+                <p>The first implementation of a real double funnel was on 28th January 2017. This was at <a
+                        href="https://www.parkrun.co.za/voortrekkermonument/">Voortrekker Monument parkrun</a>, using
+                    software that they wrote to merge the data. You can see details of that run <a
+                        href="https://blog.parkrun.com/za/2017/02/15/what-does-it-take-to-host-a-record-breaking-parkrun/">here</a>
+                </p>
+                <p>John Jaap and Robin Davey realised that in order to cope with larger number of runners at our own
+                    Christmas Day parkrun where the option of extending the length of the finish funnel was not really
+                    possible, we needed another approach, John had heard of the event at Voortrekker Monument and so we
+                    got to work writing code and planning how we could implement it once again.</p>
+                <p>The second implementation was the initial trial using John and Robin's code some 8 years later at <a
+                        href="https://www.parkrun.org.uk/prestonpark/">Preston Park parkrun</a> on 14th June 2025,
+                    details of that one <a
+                        href="https://www.parkrun.org.uk/prestonpark/news/2025/06/15/christmas-already-double-trouble-and-555/">here</a>.
+                    This was essentially a chance for us to test the code and the funnel management with a view to using
+                    it on our future Christmas day events where we can expect a much larger turnout than usual.</p>
+                <p>We trialled it again and then succesfully implemented it on Christmas day 2025 when it dealt with 1,475 runners with ease.</p>
+                <p>Since then we've decided to use this on a weekly basis as we regularly get too many for our single funnel to cope with. We've found that 
+                things run much more smoothly with a double funnel.</p>
+                <p>It has now also been used by other parkruns, with great success.</p>
+            </div>
+            <div class="section">
+                <h2>How we do it</h2>
+                <p>Imagine two parkruns running in parallel but with two differing sets of tokens it's really as simple
+                    as that.</p>
+                <p>Each of the funnels is processed independently so that any changes can be made to either funnel if
+                    required in a similar way to EMS,
+                    the data from each funnel is then merged, sorting the data by finish time and assigning a new
+                    position for each athlete. </p>
+
+                <img src="mergingoffunnels.png"
+                alt="Merged funnels" />
+                <p>A new timer file is created from the two original files as well as a new scanner file containing new
+                    token numbers and athlete information.</p>
+
+            </div>
+
+
+            <div class="section">
+                <h2>Event Operation</h2>
+                <ul>
+                    <li>Two completely separate funnels, each have their own timer(s) and token distributor(s).</li>
+                    <li>Funnel A has tokens 1 to 499 (or 1 to 999 depending on the size of the event).</li>
+                    <li>Funnel B has tokens 500 to 999 (or 1000 to 1999).</li>
+                    <li>Optionally a funnel manager holding an arrow sign in each hand directs finishers left or right,
+                        roughly equal
+                        numbers to each side. If one fills up, they send more to the quieter side.</li>
+                    <li>It’s preferable that the first 20 to 30 finishers all go to Funnel A to give a firm base to
+                        start from
+                        and to make it easier to distinguish between funnels A & B timer files.</li>
+                    <li>When finish becomes busy, finishers split to either side. It doesn’t matter which, providing
+                        that
+                        once they have crossed the line they remain on that side.</li>
+                    <li>Funnel managers need to not only check for funnel duckers out of the funnel, but also any
+                        ducking between funnels.</li>
+                    <li> Timekeeper or Number Checker in Funnel A should monitor the token numbers to ensure the funnel is closed and
+                    finishers directed to Funnel B, before they run out of tokens.</li>
+                    <li>When finishers quieten down, close either funnel and send the last finishers through the other.
+                        This isn't
+                        vital, but when the gaps between finishers are large it's easier to control results if they
+                        aren't
+                        split between A and B.</li>
+                    <li>Finishers use any barcode scanner, there is no need to have a separate group of scanners for
+                        each funnel.
+                    </li>
+                    <li>Use the parkrohn application to prepare the data ready for processing in EMS.</li>
+                </ul>
+            </div>
+            <div class="section">
+                <h2>Disadvantages of a Real Double Funnel and parkrohn</h2>
+                <ul>
+                    <li>May need more volunteers, especially time keepers and finish token handlers, although this may
+                        be offset by less funnel managers if the funnel is much shorter.</li>
+                    <li>Due to the increased speed in which athletes can be processed through the funnels, bar code
+                        scanners are likely to see an increase in numbers of athletes waiting to be scanned at any one
+                        time, this is especially noticable during the peak finish times.</li>
+                    <li>Events will need more tokens than are required for a single funnel to ensure that there is no possiblitily of running out.
+                        It is recommeneded that the event uses tokens 1-500 in funnel A and 501-1000 in funnel B. Although this is obviously dependant on numbers expected.</li>
+                    <li>Additional processing of results, first in parkrohn, and then in EMS.</li>
+                    <li>Small changes to published results may require rstroring the session from parkrohn and
+                        publishing a whole new set of data.</li>
+                    <li>Also see limitations and known issues in the user guide.</li>
+                </ul>
+            </div>
+        </div>
+</body>
+
+</html>

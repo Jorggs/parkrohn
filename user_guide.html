@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>parkrohn User Guide</title>
+    <style>
+        :root {
+            --brand: #4B0082;
+            --bg1: #f6f7ff;
+            --bg2: #f2f0fb;
+            --card: rgba(255, 255, 255, 0.94);
+            --border: rgba(75, 0, 130, 0.14);
+            --shadow: 0 14px 40px rgba(0, 0, 0, 0.10);
+            --text: #1b1b1f;
+            --muted: #545463;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            margin: 0;
+            padding: 32px 16px 48px;
+            line-height: 1.65;
+            color: var(--text);
+            background:
+                radial-gradient(1100px 700px at 15% 10%, rgba(108, 123, 215, 0.30), transparent 60%),
+                radial-gradient(900px 600px at 90% 20%, rgba(75, 0, 130, 0.16), transparent 55%),
+                linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: var(--card);
+            border-radius: 18px;
+            padding: 22px 22px 10px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        /* ── Header layout ── */
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            padding: 8px 0 18px;
+            flex-wrap: wrap;
+        }
+
+        .logo-container {
+            flex-shrink: 0;
+        }
+
+        .logo-container img {
+            width: 160px;
+            height: auto;
+            border-radius: 14px;
+            display: block;
+        }
+
+        /* ── Showcase panel ── */
+        .showcase {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .showcase-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .showcase-label span {
+            color: var(--brand);
+        }
+
+        .ticker-wrap {
+            position: relative;
+            overflow: hidden;
+            height: 52px;
+        }
+
+        .ticker-slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.55s cubic-bezier(.4, 0, .2, 1),
+                transform 0.55s cubic-bezier(.4, 0, .2, 1);
+            pointer-events: none;
+        }
+
+        .ticker-slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ticker-slide.leaving {
+            opacity: 0;
+            transform: translateY(-22px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        .parkrun-name {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--brand);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .dot-strip {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(75, 0, 130, 0.18);
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .dot.active {
+            background: var(--brand);
+            transform: scale(1.35);
+        }
+
+        .brand {
+            display: none;
+        }
+
+        h1,
+        h2 {
+            color: var(--brand);
+            margin-top: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 6px 0 18px;
+            padding: 10px 0 6px;
+            border-top: 1px solid rgba(75, 0, 130, 0.10);
+            border-bottom: 1px solid rgba(75, 0, 130, 0.10);
+        }
+
+        .nav-buttons a {
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background-color: rgba(75, 0, 130, 0.06);
+            color: var(--brand);
+            border: 1px solid rgba(75, 0, 130, 0.18);
+            font-weight: 600;
+            transition: transform 0.12s ease, background-color 0.18s ease, border-color 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .nav-buttons a:hover {
+            background-color: rgba(75, 0, 130, 0.12);
+            border-color: rgba(75, 0, 130, 0.28);
+            transform: translateY(-1px);
+        }
+
+        .section {
+            margin-bottom: 14px;
+            padding: 16px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(75, 0, 130, 0.10);
+            background: rgba(255, 255, 255, 0.78);
+        }
+
+        .section h2 {
+            margin: 0 0 10px;
+            font-size: 1.25rem;
+        }
+
+        p {
+            margin: 10px 0;
+            color: #2a2a33;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 10px 0 0;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .section img {
+            max-width: 100%;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.10);
+            margin-top: 10px;
+        }
+
+        a {
+            color: var(--brand);
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding-top: 18px;
+            }
+
+            .container {
+                padding: 18px 16px 8px;
+            }
+
+            .section {
+                padding: 14px 14px;
+            }
+
+            .nav-buttons {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-row">
+            <div class="logo-container">
+                <img src="parkrohn-logo.png" alt="parkrohn logo">
+            </div>
+            <div class="showcase">
+                <div class="showcase-label">
+                    Parkruns that have used parkrohn &mdash; <span id="count-label"></span> and counting!
+                </div>
+                <div class="ticker-wrap" id="ticker"></div>
+                <div class="dot-strip" id="dots"></div>
+            </div>
+        </div>
+
+        <script>
+            // ── ADD NEW PARKRUNS HERE ──────────────────────────────────────────
+        const PARKRUNS = [
+            "Preston Park",
+            "Hove Promenade",
+            "Norwich",
+            "Milton Keynes",
+            "Worcester",
+            "University Parks",
+            "Coventry",
+            "Green Park",
+			"Victoria Embankment",
+			"Cassiobury",
+        ];
+        // ──────────────────────────────────────────────────────────────────
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const ticker = document.getElementById('ticker');
+            const dotStrip = document.getElementById('dots');
+            const countLabel = document.getElementById('count-label');
+
+            countLabel.textContent = PARKRUNS.length;
+
+            const otherCount = document.getElementById('other-count');
+            if (otherCount) otherCount.textContent = PARKRUNS.length - 1;
+
+            const slides = PARKRUNS.map((name, i) => {
+                const el = document.createElement('div');
+                el.className = 'ticker-slide' + (i === 0 ? ' active' : '');
+                el.innerHTML = `<span class="parkrun-name">${name} parkrun</span>`;
+                ticker.appendChild(el);
+                return el;
+            });
+
+            const dots = PARKRUNS.map((_, i) => {
+                const d = document.createElement('div');
+                d.className = 'dot' + (i === 0 ? ' active' : '');
+                dotStrip.appendChild(d);
+                return d;
+            });
+
+            let current = 0;
+
+            function advance() {
+                const prev = current;
+                current = (current + 1) % PARKRUNS.length;
+
+                slides[prev].classList.remove('active');
+                slides[prev].classList.add('leaving');
+                dots[prev].classList.remove('active');
+
+                setTimeout(() => slides[prev].classList.remove('leaving'), 500);
+
+                slides[current].classList.add('active');
+                dots[current].classList.add('active');
+            }
+
+            setInterval(advance, 2800);
+        });
+        </script>
+        <div class="container">
+            <div class="nav-buttons">
+                <a href="home.html">Home</a>
+                <a href="news.html">News</a>
+                <a href="parkrohn.html" target="_blank" title="Opens in a new tab">Process Funnels</a>
+                <a href="Multi_Funnel_Splitter.html" target="_blank" title="Opens in a new tab">Create Sample Data</a>
+                <a href="funnel-simulator.html" target="_blank" title="Opens in a new tab">Funnel Simulator</a>
+
+            </div>
+
+            <h1>parkrohn User Guide</h1>
+
+
+            <h1>Guide</h1>
+            <div class="section">
+
+                <h2>Features</h2>
+                <p>Can be used to:</p>
+                <ul>
+                    <li>Process results when a Real Double/Multiple Funnel has been used.</li>
+                    <li>Fix single or double/multiple funnel results when:</li>
+                    <ul>
+                        <li>Block(s) of tokens have been given out in reverse order.</li>
+                        <li>Block(s) of tokens have been dropped.</li>
+                        <li>Blocks of tokens swapped (e.g. blocks 200 to 299 and 100 to 199 given in the wrong order).
+                        </li>
+                    </ul>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Process</h2>
+                <p>Download results files (single or double/multiple funnels). In EMS select
+                    <strong>Results / Create</strong>. Left click on each of the Timer (
+<svg style="width:1em; height:1em; vertical-align:middle; fill:currentColor;" focusable="false" aria-hidden="true"
+    viewBox="0 0 24 24">
+    <path
+        d="M9 1h6v2H9zm10.03 6.39 1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61M13 14h-2V8h2z" />
+</svg>
+                ) and Scanner ( <svg style="width:1em; height:1em; vertical-align:middle; fill:currentColor;" focusable="false" aria-hidden="true"
+                        viewBox="0 0 24 24">
+                        <path
+                            d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m-7 2h2.5v12H13zm-2 12H8.5V6H11zM4 6h2.5v12H4zm16 12h-2.5V6H20z" />
+                    </svg> ) icons at the right hand side in turn then Save and Cancel. This gives a set of data files in
+                    your
+                    Downloads folder. These are the files you will use for this parkrohn web app. You may want to download all timer files, so you can check which of each of the funnel files is the better to use, in the same way as you might in EMS.</p>
+            </div>
+
+            <div class="section">
+                <h2>Single Funnel</h2>
+                <ul>
+                    <li>Drag and drop one timer file into timer A box.</li>
+                    <li>Drag and drop all scanner files into scanner box.</li>
+                    <li>The timer B box must <strong>not</strong> have files dropped onto it for this feature to work.
+                    </li>
+                    <li>Tap ‘<strong>Create Single Funnel</strong>’.</li>
+                    <li>Optionally add details of non scanning athletes.</li>
+                    <li>Tidy up the funnel prior to uploading back into EMS.</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Double or Multiple Funnels</h2>
+                <ul>
+                    <li>Drag and drop funnel A timer file into timer A box.</li>
+                    <li>Drag and drop funnel B timer file into timer B box.</li>
+                    <li>Continue to drag and drop timer files until all funnels have files</li>
+                    <li>Drag and drop all scanner files into scanner box.</li>
+                    <li>Change if necessary Funnel B Start Value (first token number of Funnel B) as this may be
+                        different to the default value offered.</li>
+                    <li>Repeat for all remaining funnels</li>
+                    <li>Tap ‘<strong>Create Funnels</strong>’.</li>
+                    <li>Add details of any non scanning athletes recorded to each funnel, it is important to do this
+                        prior to combining the funnels as position numbers will change once combining has taken place.
+                    </li>
+                    <li>Tidy up all funnels prior to combining and uploading back into EMS.</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Optionally add names</h2>
+                <ul>
+                    <li>Click on the <strong>Get Athlete Names</strong> button and follow the instructions on screen</li>
+                </ul>
+            </div>
+            <div class="section">
+                <h2>Double/Multiple (must do) / Single (can do)</h2>
+                <p>Insert or Remove Unknown Athletes or Times to get the number of times and athletes to match. This is
+                    very
+                    difficult to fix after merging the funnels and if not done results will be inaccurate if there were
+                    funnel duckers or dropped tokens.</p>
+                <p> Controls to do these actions are a little different to EMS.</p>
+                <img src="examplenew.png"
+                        alt="Example" />
+
+                <p>Starting from the left:</p>
+                <ul>
+                    <li><Strong>Position in Funnel</strong> - This is the position in the funnel they passed through,
+                        not the athlete's actual
+                        position in the run.</li>
+                    <li><Strong>Time</strong></li>
+                    <li><Strong>Athlete number</strong></li>
+                    <li><Strong>Athlete Name</Strong> (if retrieved)</li>
+                </ul>
+                <p>Buttons (displayed after clicking on discloure arrow)</p>
+                <p>Top row</>
+                <ul>
+                    <li><Strong>Add Athlete</strong> - Causes athletes from this point onwards to shift down into the
+                        times below
+                        creating a new empty athlete row.</li>
+                    <li><Strong>Delete Athlete</strong> - Cause athletes from this point onwards to shift upwards and
+                        remove the
+                        athlete details of the selected row. </li>
+                    <li><Strong>Amend Athlete</strong> - Allows the athlete number to be amended. Note: There is no
+                        check available
+                        to establish if the new athlete number is a valid athlete (unless they are already in the list
+                        of names retrieved).</li>
+                </ul>
+                <p>Bottom Row</p>
+                <ul>
+                    <li><Strong>Add Time</strong> - Inserts a new time identical to the row selected and all other times
+                        are shifted
+                        down.</li>
+                    <li><Strong>Delete Time</strong> - Removes the time of the row selected and all other times are
+                        shifted up.</li>
+                    <li><Strong>Amend Time</strong> - Allows the selected time to be amended, this can only be amended to
+                        a time less
+                        than the row below and greater than the row above.</li>
+                </ul>
+
+                <p><strong>Colours</strong>
+                <p>A fully populated row will be shown in Green, times without athletes will be in yellow and athletes
+                    without times
+                    in red as above.
+                    In the example above the last athlete in the funnel was scanned but there haven't been enough times
+                    recorded.
+                    Removing the athlete in row 951 will resolve this issue.</p>
+
+            </div>
+            <div class="section">
+                <h2>Funnel Duckers (THIS BIT IS IMPORTANT)</h2>
+                <h3>*** See the practical impact of funnel duckers in the news above. ***</h3>
+                <h3>*** These concerns are much less of an issue than we thought they may have been. ***</h3>
+                
+                <p>Funnel duckers are more of a problem when it comes to a real double/multiple funnel
+                    it is unfortunately one of the downsides of this type of funnel.
+                    These can only really be resolved within the parkrohn software because once merging of the funnels
+                    has occured then
+                    it's very difficult to amend the results to correct them. </P>
+                <h2>Examples (assuming Double funnel)</h2>
+                <h3>Funnel Ducking in either Funnel</h3>
+                <p>Below shows a situation where a runner ducks out of each funnel. The ducked athletes are shown in red
+                    (incorrect
+                    positions are in brackets).
+                    <img src="funnelduckers1.png"
+                                                alt="Ducking from individual funnels" />
+            Here the solution would be (as with EMS) to insert a blank athlete in parkrohn back into the position that the runner ducked out from, albeit in this case, one from each funnel. This would shift the times down and back to where they should be.
+                </p>
+                <h3>Funnel Ducking across Funnels</h3>
+                <p>Below shows a situation where a runner ducks out of one funnel and into the other. The ducked athlete
+                    is shown in
+                    red (incorrect positions are in brackets).</p>
+                <img src="funnelduckers2.png"
+                                                        alt="Ducking across funnels" />
+                <p>This will be difficult to resolve unless you saw the offence take place, if so, then make a note of
+                    the token
+                    number that the offender took (in this case 501), this will help you resolve the funnel they took a
+                    token from
+                    as you can simply remove that athlete to bring funnel back on track.
+                    The problem comes now that you need to establish where they came from. Again if this was witnessed,
+                    then you can
+                    ascertain which token they should have taken and insert an athlete in that funnel accordingly.
+                    If funnel ducking between funnels happens wthout knowing it then it has the capacity to skew the
+                    results
+                    considerably as it will reduce athletes times in one funnel and increase them in the other. It may
+                    be worth having a funnel manager in the middle of the funnels to look specifically for this type of
+                    offending. It is worth noting, that most funnel ducking occurs because the individual isn't
+                    interested in getting a time at all, so ducking between two funnels is not that likely an occurance
+                    especially if both funnels are moving at a similar pace.
+                </p>
+            </div>
+            <div class="section">
+                <h1>Optional actions if required</h2>
+            </div>
+            <div class="section">
+                <h2>Tidy Up Reverse Order</h2>
+                <ul>
+                    <li>Tap ‘Reverse Tokens’.</li>
+                    <li>Enter Start and Finish numbers of reversed block.</li>
+                    <li>Tap ‘Reverse selected tokens’.</li>
+                    <li>Token block will be flipped and highlighted in pink along with up/down indicators in Position
+                        field.</li>
+                </ul>
+                <img src="reversednew.png"
+                alt="Reversed" />
+            </div>
+
+
+            <div class="section">
+                <h2>Swapped Blocks</h2>
+                <ul>
+                    <li>Tap ‘SwapTokens’.</li>
+                    <li>Enter Start and End of first block, Start of second block.</li>
+                    <li>Tap ‘SwapTokens’.</li>
+                    <li>Selected blocks will be swapped and highlighted in lilac along with left/right indicators in
+                        Position field.</li>
+                </ul>
+                <img src="swappednew.png"
+                alt="Swapped" />
+            </div>
+
+            <div class="section">
+                <h2>Swapped and Reversed Tokens</h2>
+                <ul>
+                    <li>If both operations have been performed selected blocks will be highlighted in brown along with
+                        left/right and up/down indicators in Position field.</li>
+                </ul>
+                <img src="swappedandreversednew.png"
+                alt="Swapped and Reversed" />
+            </div>
+
+            <div class="section">
+                <h2>Dropped Tokens</h2>
+                <ul>
+                    <li>Tap ‘Remove dropped tokens’.</li>
+                    <li>Suggested batches of dropped tokens will be shown.</li>
+                    <li>If you agree with the suggestions, tap ‘Remove’.</li>
+                    <li>Tokens will be removed and all athletes moved up.</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Other Features now available</h2>
+                <ul>
+                    <h3>Undo/Redo</h3>
+                    <li>All amendments to the funnel data can be undone or redone to make editing easier.</li>
+                    <h3>Restore previous session</h3>
+                    <li>This will re-populate the page with the state it was at last time you used it. Very handy if
+                        later amedments need to be made.</li>
+                    <h3>Import/Export Session</h3>
+                    <li>This can be used to download or load the data along with all Undo/Redo history so these can be
+                        shared with others. Useful if you want to send your data off for someone elso to confirm or
+                        assist with.
+                        Also useful so that a permanent copy can be kept.</li>
+                    <h3>Tabbed View</h3>
+                    <li>Tabbed view is the only option for multiple funnel, but it can be switched on or off for double
+                        funnels where screensize prevents easy editing when side by side.</li>
+                    <h3>Statistics</h3>
+                    <li>Various graphs detailing runner distibution across funnels/time.</li>
+                    <h3>Info Panels</h3>
+                    <li>These show information in relation to scanning issues, either athletes who have no pnumber or
+                        multiple athletes against a single pnumber.</li>
+                </ul>
+            </div>
+
+
+            <div class="section">
+                <h1>Final Steps</h2>
+                    <ul>
+                        <li>Tap ‘View merged funnel for download’.</li>
+                        <li>Scroll through the funnel data to the bottom to see save buttons.</li>
+                        <li>Tap ‘Download Timer File’ file will be saved as timer.csv</li>
+                        <li>Tap ‘Download Scan File’ file will be saved as scan.txt</li>
+                        <li>The files created can now be imported into EMS for processing.</li>
+                        <li>Note: If you already have files saved you may find that the file names have a number
+                            appended to the file name, eg timer-xx.csv</li>
+                    </ul>
+            </div>
+
+            <div class="section">
+                <h2>In EMS Results Page</h2>
+                <ul>
+                    <li>Select ‘Direct Upload’ from menu, bottom, centre.</li>
+                    <li>Select the newly created Scan and Timer files.</li>
+                    <li>Make sure these 2 files are ticked and all others unticked.</li>
+                    <li>Continue as normal results processing.</li>
+                </ul>
+            </div>
+
+
+            <div class="section">
+                <h2>Limitations and known issues with parkrohn</h2>
+                <ul>
+                    <li>If amendments need to be made after the results have been produced, it may be required in
+                        certain circumstances to restore the parkrohn session, make further amendments and republish a
+                        whole set of results rather than do small edits. </li>
+                    <li>There is no validation on the files dropped onto sections. If you are seeing very strange
+                        results, reload the page and ensure the correct files are dropped on the correct areas.</li>
+                    <li>No validation on athlete numbers, other than the fact it has to be a number. If you enter an
+                        unknown athlete number, no checks will be made. </li>
+                    <li>This has been tested with source files that have been uploaded directly into EMS via the
+                        volunteer app and also files that are emailed from the volunteer app (for some reason these
+                        files are different from those uploaded directly), however, parkrun may change the format at
+                        anytime and this will no doubt break this!</li>
+                    <li>Times amended or added should be delimited with colons eg MM:SS or H:MM:SS.</li>
+                    <li>There is currently no way to use parkruns API to get runner names. We've come up with a solution
+                        that makes getting names possible, hopefully one day we may be able to offer a better solution...
+                    </li>
+                    <li>When duplicate position numbers are found in the scan files, a warning will be shown, only one
+                        of the athletes against that position will be shown in the funnel but all athlete numbers are
+                        viewable in the warning given. This situation will require further investigation as it would in
+                        EMS although the duplicated position numbers will not end up in the final upload.</li>
+                    <li>If you are seeing a large number of blank rows in Funnel B make sure the starting token number
+                        for funnel B is correct. You can change this value and recreate the funnels without having to
+                        reload the page and drag and drop again.</li>
+                    <li>There is a bug whereby removing a block of dropped tokens at the end of the funnel does not work
+                        correctly. This isn't actually a likely scenario, but is mentioned here for transparency.</li>
+                    <li>No provision has been made for smaller screens other than tabbed funnels, and is not going to be
+                        implemented due to the amount of effort required to do so, and the fact that John and Robin prefer a
+                        bigger screen!</li>
+                    <li>This is not endorsed by parkrun and has been written independently of them, it is a project that
+                        Robin Davey and John Jaap from Preston Park parkrun have undertaken purely because the
+                        functionality is not available as it stands in the official EMS web app and we wanted some way
+                        to easily process results using a real double funnel.
+                    <li>Finally, this is supplied as is and used at your own risk. If you are thinking of trialling a
+                        real double funnel, then please <a
+                           <a href="mailto:report@parkrohn.run?subject=RDF Query">send us an
+                            email</a> and we will endeavour to help you get prepared.
